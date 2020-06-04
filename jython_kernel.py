@@ -1,5 +1,5 @@
 from ipykernel.kernelbase import Kernel
-from IPython.utils.path import locate_profile
+from IPython.paths import locate_profile
 from pexpect import replwrap,EOF,spawn
 import signal
 import re
@@ -42,7 +42,6 @@ class JythonKernel(Kernel):
                raise Exception("JYTHON_HOME not set or jython not found") 
             self._child  = spawn(self._executable,timeout = None)
             self._child.waitnoecho(True)
-            self._child.expect(u">>> ")
             self._child.expect(u">>> ")
             self._child.setwinsize(600,400)
         finally:
@@ -156,8 +155,7 @@ class JythonKernel(Kernel):
         for line in code.splitlines():
             self._child.sendline(line)
             now_prompt=self._child.expect_exact([u">>> ",u"... "])
-            if len(self._child.before.splitlines())>1:    out+='\n'.join(self._child.before.splitlines()[1:])+'\n'
-            now_prompt=self._child.expect_exact([u">>> ",u"... "])
+            if len(self._child.before.splitlines())>1:    out+='\n'.join(self._child.before.decode('UTF-8').splitlines()[1:])+'\n'
         return out
 
 if __name__ == '__main__':
